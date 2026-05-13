@@ -1,7 +1,7 @@
 package com.tulocal.backend.modules.Business.api.controller;
 
 import com.tulocal.backend.modules.Business.application.mapper.BusinessMapper;
-import com.tulocal.backend.modules.Business.application.usecase.GetBusinessDetailUseCase;
+import com.tulocal.backend.modules.Business.application.usecase.GetAllBusinessByIdUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.GetAllBusinessUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.SearchBusinessByNameUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.GetBusinessByCategoryUseCase;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BusinessController {
     private final GetAllBusinessUseCase getAllBusinessUseCase;
-    private final GetBusinessDetailUseCase getBusinessDetailUseCase;
+    private final GetAllBusinessByIdUseCase getAllBusinessByIdUseCase;
     private final SearchBusinessByNameUseCase searchBusinessByNameUseCase;
     private final GetBusinessByCategoryUseCase getBusinessByCategoryUseCase;
     private final BusinessMapper businessMapper;
@@ -37,8 +37,8 @@ public class BusinessController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> getBusinessById(@PathVariable UUID id) {
-        var response = getBusinessDetailUseCase.execute(id);
+    public ResponseEntity<ApiResponse<BusinessResponse>> getBusinessById(@PathVariable UUID id) {
+        BusinessResponse response = businessMapper.toResponse(getAllBusinessByIdUseCase.execute(id));
         return ResponseEntity.ok(ApiResponse.ok("Negocio obtenido correctamente", response));
     }
 
