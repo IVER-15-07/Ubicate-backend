@@ -2,6 +2,7 @@ package com.tulocal.backend.modules.Business.application.mapper;
 
 import com.tulocal.backend.modules.Business.domain.model.Business;
 import com.tulocal.backend.modules.Business.api.response.BusinessResponse;
+import com.tulocal.backend.modules.Business.api.response.LocationResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +20,13 @@ public class BusinessMapper {
         response.setBannerUrl(business.getBannerUrl());
         response.setIsActive(business.getIsActive());
         response.setCreadoEn(business.getCreadoEn());
+
+        LocationResponse locationResponse = new LocationResponse();
+        locationResponse.setLat(business.getLat());
+        locationResponse.setLng(business.getLng());
+        locationResponse.setDireccion(business.getDireccion());
+
+        response.setLocation(locationResponse);
 
         return response;
 

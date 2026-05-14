@@ -14,6 +14,9 @@ public class Business {
     private Integer categoryId;
     private String LogoUrl;
     private String bannerUrl;
+    private Double lat;
+    private Double lng;
+    private String direccion;
     private Boolean isActive;
     private LocalDateTime creadoEn;
 
