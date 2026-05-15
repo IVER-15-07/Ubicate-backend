@@ -17,15 +17,19 @@ public class BusinessRepositoryImpl implements BusinessRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private static final String BASE_SELECT = "SELECT b.*, loc.lat AS location_lat, loc.lng AS location_lng, loc.direccion AS location_direccion "
-            +
+    private static final String BASE_SELECT = "SELECT b.*, " +
+            "c.nombre AS category_nombre, " +
+            "loc.lat AS location_lat, " +
+            "loc.lng AS location_lng, " +
+            "loc.direccion AS location_direccion " +
             "FROM business b " +
-            "LEFT JOIN LATERAL (" +
+            "LEFT JOIN category c ON c.id = b.category_id " +
+            "LEFT JOIN LATERAL ( " +
             "  SELECT l.lat, l.lng, l.direccion " +
             "  FROM locations l " +
             "  WHERE l.business_id = b.id " +
             "  ORDER BY l.creado_en DESC " +
-            "  LIMIT 1" +
+            "  LIMIT 1 " +
             ") loc ON true ";
 
     private final RowMapper<Business> businessRowMapper = (rs, rowNum) -> {
@@ -35,6 +39,7 @@ public class BusinessRepositoryImpl implements BusinessRepository {
         business.setNombre(rs.getString("nombre"));
         business.setDescripcion(rs.getString("descripcion"));
         business.setCategoryId(rs.getInt("category_id"));
+        business.setCategoryNombre(rs.getString("category_nombre"));
         business.setLogoUrl(rs.getString("logo_url"));
         business.setBannerUrl(rs.getString("banner_url"));
 

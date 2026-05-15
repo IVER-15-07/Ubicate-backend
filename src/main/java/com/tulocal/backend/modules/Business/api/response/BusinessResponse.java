@@ -12,7 +12,11 @@ public class BusinessResponse {
     private UUID ownerUserId;
     private String nombre;
     private String descripcion;
-    private Integer categoryId;
+
+
+    private CategoryResponse category;
+
+
     private String logoUrl;
     private String bannerUrl;
     private Boolean isActive;

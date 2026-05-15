@@ -3,6 +3,7 @@ package com.tulocal.backend.modules.Business.application.mapper;
 import com.tulocal.backend.modules.Business.domain.model.Business;
 import com.tulocal.backend.modules.Business.api.response.BusinessResponse;
 import com.tulocal.backend.modules.Business.api.response.LocationResponse;
+import com.tulocal.backend.modules.Business.api.response.CategoryResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +16,13 @@ public class BusinessMapper {
         response.setOwnerUserId(business.getOwnerUserId());
         response.setNombre(business.getNombre());
         response.setDescripcion(business.getDescripcion());
-        response.setCategoryId(business.getCategoryId());
+
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setId(business.getCategoryId());
+        categoryResponse.setNombre(business.getCategoryNombre());
+
+        response.setCategory(categoryResponse);
+
         response.setLogoUrl(business.getLogoUrl());
         response.setBannerUrl(business.getBannerUrl());
         response.setIsActive(business.getIsActive());

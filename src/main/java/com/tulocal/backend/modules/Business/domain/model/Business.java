@@ -12,6 +12,7 @@ public class Business {
     private String  nombre;
     private String descripcion;
     private Integer categoryId;
+    private String categoryNombre;
     private String LogoUrl;
     private String bannerUrl;
     private Double lat;
