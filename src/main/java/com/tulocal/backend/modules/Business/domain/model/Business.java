@@ -3,6 +3,7 @@ package com.tulocal.backend.modules.Business.domain.model;
 import lombok.Data;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -15,10 +16,7 @@ public class Business {
     private String categoryNombre;
     private String LogoUrl;
     private String bannerUrl;
-    private Double lat;
-    private Double lng;
-    private String direccion;
     private Boolean isActive;
     private LocalDateTime creadoEn;
-
+    private List<Branch> branches;
 }

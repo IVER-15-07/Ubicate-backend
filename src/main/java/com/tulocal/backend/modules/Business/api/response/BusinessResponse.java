@@ -3,6 +3,7 @@ package com.tulocal.backend.modules.Business.api.response;
 import lombok.Data;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -13,14 +14,12 @@ public class BusinessResponse {
     private String nombre;
     private String descripcion;
 
-
     private CategoryResponse category;
-
 
     private String logoUrl;
     private String bannerUrl;
     private Boolean isActive;
     private LocalDateTime creadoEn;
 
-    private LocationResponse location;
+    private List<BranchResponse> branches;
 }
