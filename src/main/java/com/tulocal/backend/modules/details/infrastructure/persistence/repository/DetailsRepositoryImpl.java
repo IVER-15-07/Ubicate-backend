@@ -132,7 +132,6 @@ public class DetailsRepositoryImpl implements DetailsRepository {
         BranchDetail branch = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
             BranchDetail item = new BranchDetail();
             item.setId(UUID.fromString(rs.getString("id")));
-            item.setBusinessId(UUID.fromString(rs.getString("business_id")));
             item.setNombre(rs.getString("nombre"));
             item.setCreadoEn(rs.getTimestamp("creado_en").toLocalDateTime());
 

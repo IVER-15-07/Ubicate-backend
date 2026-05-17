@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Data
 public class BranchDetailResponse {
     private UUID id;
-    private UUID businessId;
     private String nombre;
     private LocalDateTime creadoEn;
     private LocationDetailResponse location;
