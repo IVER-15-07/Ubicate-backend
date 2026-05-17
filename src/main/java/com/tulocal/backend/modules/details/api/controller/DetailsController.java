@@ -1,5 +1,6 @@
 package com.tulocal.backend.modules.details.api.controller;
 import com.tulocal.backend.modules.details.application.mapper.DetailsMapper;
+import com.tulocal.backend.modules.details.application.usecase.GetBusinessDetailByBranchUseCase;
 import com.tulocal.backend.modules.details.application.usecase.GetBusinessDetailUseCase;
 import com.tulocal.backend.modules.details.api.response.BusinessDetailResponse;
 import com.tulocal.backend.common.ApiResponse;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class DetailsController {
     
     private final GetBusinessDetailUseCase getBusinessDetailUseCase;
+    private final GetBusinessDetailByBranchUseCase getBusinessDetailByBranchUseCase;
     private final DetailsMapper detailsMapper;
 
     @GetMapping("/{businessId}")
@@ -23,6 +25,14 @@ public class DetailsController {
             getBusinessDetailUseCase.execute(businessId)
         );
         return ResponseEntity.ok(ApiResponse.ok("Detalle obtenido correctamente", response));
+    }
+
+    @GetMapping("/branch/{branchId}")
+    public ResponseEntity<ApiResponse<BusinessDetailResponse>> getBusinessDetailByBranch(@PathVariable UUID branchId) {
+        BusinessDetailResponse response = detailsMapper.toResponse(
+                getBusinessDetailByBranchUseCase.execute(branchId)
+        );
+        return ResponseEntity.ok(ApiResponse.ok("Detalle del negocio por branch obtenido correctamente", response));
     }
 
 }

@@ -7,4 +7,6 @@ import java.util.UUID;
 public interface DetailsRepository {
     
     BusinessDetail getBusinessDetails(UUID businessId);
+
+    BusinessDetail getBusinessDetailsByBranchId(UUID branchId);
 }
