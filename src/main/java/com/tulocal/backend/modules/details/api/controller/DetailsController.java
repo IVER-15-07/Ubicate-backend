@@ -11,7 +11,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/api/details")
+@RequestMapping("/api/detalles")
 @RequiredArgsConstructor
 public class DetailsController {
     
@@ -27,7 +27,7 @@ public class DetailsController {
         return ResponseEntity.ok(ApiResponse.ok("Detalle obtenido correctamente", response));
     }
 
-    @GetMapping("/branch/{branchId}")
+    @GetMapping("/sucursal/{branchId}")
     public ResponseEntity<ApiResponse<BusinessDetailResponse>> getBusinessDetailByBranch(@PathVariable UUID branchId) {
         BusinessDetailResponse response = detailsMapper.toResponse(
                 getBusinessDetailByBranchUseCase.execute(branchId)
