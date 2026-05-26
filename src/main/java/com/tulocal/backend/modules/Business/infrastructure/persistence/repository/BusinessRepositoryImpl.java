@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +35,9 @@ public class BusinessRepositoryImpl implements BusinessRepository {
             "LEFT JOIN category c ON c.id = b.category_id " +
             "LEFT JOIN branch br ON br.business_id = b.id " +
             "LEFT JOIN locations l ON l.branch_id = br.id ";
+
+        private static final String ACCENT_SOURCE = "ÁÀÄÂÃáàäâãÉÈËÊéèëêÍÌÏÎíìïîÓÒÖÔÕóòöôõÚÙÜÛúùüûÑñÇç";
+        private static final String ACCENT_TARGET = "AAAAAaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUUuuuuNnCc";
 
     private final RowMapper<Business> businessRowMapper = (rs, rowNum) -> {
         Business business = new Business();
@@ -91,10 +95,11 @@ public class BusinessRepositoryImpl implements BusinessRepository {
 
     @Override
     public List<Business> searchByNombreOrDescripcion(String searchTerm) {
+        String normalizedSearchTerm = normalizeSearchTerm(searchTerm);
+        String searchPattern = "%" + normalizedSearchTerm + "%";
         String sql = SELECT_WITH_BRANCHES + "WHERE b.is_active = true AND " +
-            "(unaccent(LOWER(b.nombre)) LIKE unaccent(LOWER(?)) OR " +
-            "unaccent(LOWER(b.descripcion)) LIKE unaccent(LOWER(?)))";
-        String searchPattern = "%" + searchTerm + "%";
+            "(" + normalizedTextExpression("b.nombre") + " LIKE ? OR " +
+            normalizedTextExpression("b.descripcion") + " LIKE ?)";
         return queryBusinessesWithBranches(sql, searchPattern, searchPattern);
     }
 
@@ -180,6 +185,24 @@ public class BusinessRepositoryImpl implements BusinessRepository {
         }, args);
 
         return new java.util.ArrayList<>(map.values());
+    }
+
+    private static String normalizedTextExpression(String column) {
+        return "LOWER(TRANSLATE(COALESCE(" + column + ", ''), '" + ACCENT_SOURCE + "', '" + ACCENT_TARGET + "'))";
+    }
+
+    private static String normalizeSearchTerm(String searchTerm) {
+        if (searchTerm == null) {
+            return "";
+        }
+
+        String normalized = Normalizer.normalize(searchTerm, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase();
+
+        return normalized
+                .replace('ñ', 'n')
+                .replace('ç', 'c');
     }
 
 }
