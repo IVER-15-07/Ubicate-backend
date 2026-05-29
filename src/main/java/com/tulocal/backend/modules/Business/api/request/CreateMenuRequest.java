@@ -1,21 +1,20 @@
 package com.tulocal.backend.modules.Business.api.request;
-import lombok.Data;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.util.List;
 import java.util.UUID;
 
-
 @Data
-
-public class BusinessRequest {
+public class CreateMenuRequest {
     @NotBlank
     private String nombre;
-    private String descripcion;
-    @NotNull
-    private UUID ownerUserId;
-    private Integer categoryId;
-    private String logoUrl;
-    private String bannerUrl;
-    
+
+    @NotEmpty
+    private List<@NotNull UUID> branchIds;
+
+    private Boolean isActive;
 }
