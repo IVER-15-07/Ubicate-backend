@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class CreateUserUseCase {
@@ -17,7 +19,7 @@ public class CreateUserUseCase {
     public User execute(CreateUserRequest request) {
         String email = request.getEmail().trim();
 
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new IllegalArgumentException("Ya existe un usuario con ese email");
         }
 
@@ -25,7 +27,8 @@ public class CreateUserUseCase {
         user.setNombre(request.getNombre().trim());
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRoleId(request.getRoleId());
+        user.setRoleId(request.getRoleId() != null ? request.getRoleId() : 2);
+        user.setCreadoEn(LocalDateTime.now());
 
         return userRepository.save(user);
     }

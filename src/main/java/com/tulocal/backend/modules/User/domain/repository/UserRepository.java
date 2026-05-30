@@ -1,8 +1,10 @@
 package com.tulocal.backend.modules.User.domain.repository;
 
 import com.tulocal.backend.modules.User.domain.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository {
-    boolean existsByEmail(String email);
-    User save(User user);
+import java.util.UUID;
+
+public interface UserRepository extends JpaRepository<User, UUID> {
+    boolean existsByEmailIgnoreCase(String email);
 }

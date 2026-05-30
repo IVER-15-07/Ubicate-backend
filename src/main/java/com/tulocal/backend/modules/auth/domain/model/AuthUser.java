@@ -1,12 +1,10 @@
-package com.tulocal.backend.modules.User.domain.model;
+package com.tulocal.backend.modules.auth.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,20 +12,19 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class AuthUser {
+
     @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", updatable = true)
     private UUID id;
 
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash")
     private String passwordHash;
 
     @Column(name = "role_id")
@@ -35,4 +32,5 @@ public class User {
 
     @Column(name = "creado_en")
     private LocalDateTime creadoEn;
+
 }
