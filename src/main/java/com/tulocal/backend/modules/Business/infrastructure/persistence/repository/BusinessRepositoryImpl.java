@@ -33,7 +33,7 @@ public class BusinessRepositoryImpl implements BusinessRepository {
         private static final String SELECT_WITH_BRANCHES = "SELECT b.id, b.owner_user_id, b.nombre, b.descripcion, " +
             "b.category_id, b.logo_url, b.banner_url, b.is_active, b.creado_en, " +
             "c.nombre AS category_nombre, " +
-            "br.id AS branch_id, br.business_id AS branch_business_id, br.nombre AS branch_nombre, br.creado_en AS branch_creado_en, " +
+            "br.id AS branch_id, br.business_id AS branch_business_id, br.nombre AS branch_nombre, br.is_active AS branch_is_active, br.creado_en AS branch_creado_en, " +
             "l.id AS location_id, l.lat, l.lng, l.direccion, l.creado_en AS location_creado_en " +
             "FROM business b " +
             "LEFT JOIN category c ON c.id = b.category_id " +
@@ -150,7 +150,7 @@ public class BusinessRepositoryImpl implements BusinessRepository {
     @Override
     public Branch saveBranch(Branch branch) {
         String sql = "INSERT INTO branch (business_id, nombre) VALUES (?, ?) " +
-                "RETURNING id, business_id, nombre, creado_en";
+            "RETURNING id, business_id, nombre, is_active, creado_en";
         Branch result = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
             Branch createdBranch = new Branch();
             createdBranch.setId(UUID.fromString(rs.getString("id")));
@@ -159,6 +159,7 @@ public class BusinessRepositoryImpl implements BusinessRepository {
                 createdBranch.setBusinessId(UUID.fromString(businessId));
             }
             createdBranch.setNombre(rs.getString("nombre"));
+            createdBranch.setIsActive(rs.getBoolean("is_active"));
             java.sql.Timestamp ts = rs.getTimestamp("creado_en");
             if (ts != null) {
                 createdBranch.setCreadoEn(ts.toLocalDateTime());
@@ -324,6 +325,7 @@ public class BusinessRepositoryImpl implements BusinessRepository {
                     String bBusinessId = rs.getString("branch_business_id");
                     if (bBusinessId != null) branch.setBusinessId(UUID.fromString(bBusinessId));
                     branch.setNombre(rs.getString("branch_nombre"));
+                    branch.setIsActive(rs.getBoolean("branch_is_active"));
                     java.sql.Timestamp bts = rs.getTimestamp("branch_creado_en");
                     if (bts != null) branch.setCreadoEn(bts.toLocalDateTime());
                     branch.setLocations(new java.util.ArrayList<>());

@@ -92,17 +92,18 @@ public class DetailsRepositoryImpl implements DetailsRepository {
     }
 
     private List<BranchDetail> findBranches(UUID businessId) {
-        String sql = "SELECT br.id, br.business_id, br.nombre, br.creado_en, " +
+        String sql = "SELECT br.id, br.business_id, br.nombre, br.is_active, br.creado_en, " +
                 "l.lat, l.lng, l.direccion " +
                 "FROM branch br " +
                 "LEFT JOIN locations l ON l.branch_id = br.id " +
-                "WHERE br.business_id = ?";
+            "WHERE br.business_id = ? AND br.is_active = true";
 
         List<BranchDetail> branches = jdbcTemplate.query(sql, (rs, rowNum) -> {
             BranchDetail branch = new BranchDetail();
             branch.setId(UUID.fromString(rs.getString("id")));
             branch.setBusinessId(UUID.fromString(rs.getString("business_id")));
             branch.setNombre(rs.getString("nombre"));
+            branch.setIsActive(rs.getBoolean("is_active"));
             branch.setCreadoEn(rs.getTimestamp("creado_en").toLocalDateTime());
 
             String lat = rs.getString("lat");
@@ -123,16 +124,18 @@ public class DetailsRepositoryImpl implements DetailsRepository {
     }
 
     private BranchDetail findBranchById(UUID branchId) {
-        String sql = "SELECT br.id, br.business_id, br.nombre, br.creado_en, " +
+        String sql = "SELECT br.id, br.business_id, br.nombre, br.is_active, br.creado_en, " +
                 "l.lat, l.lng, l.direccion " +
                 "FROM branch br " +
                 "LEFT JOIN locations l ON l.branch_id = br.id " +
-                "WHERE br.id = ?";
+            "WHERE br.id = ? AND br.is_active = true";
 
         BranchDetail branch = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
             BranchDetail item = new BranchDetail();
             item.setId(UUID.fromString(rs.getString("id")));
+            item.setBusinessId(UUID.fromString(rs.getString("business_id")));
             item.setNombre(rs.getString("nombre"));
+            item.setIsActive(rs.getBoolean("is_active"));
             item.setCreadoEn(rs.getTimestamp("creado_en").toLocalDateTime());
 
             String lat = rs.getString("lat");

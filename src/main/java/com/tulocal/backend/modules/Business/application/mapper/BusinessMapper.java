@@ -53,6 +53,7 @@ public class BusinessMapper {
         response.setId(branch.getId());
         response.setBusinessId(branch.getBusinessId());
         response.setNombre(branch.getNombre());
+        response.setIsActive(branch.getIsActive());
         response.setCreadoEn(branch.getCreadoEn());
         // Mapear locations si existen
         if (branch.getLocations() != null) {

@@ -12,6 +12,7 @@ public class BranchResponse {
     private UUID id;
     private UUID businessId;
     private String nombre;
+    private Boolean isActive;
     private LocalDateTime creadoEn;
     
     private List<LocationResponse> locations;

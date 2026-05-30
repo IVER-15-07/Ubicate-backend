@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.tulocal.backend.common.ApiResponse;
 
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -64,19 +63,22 @@ public class BusinessController {
             @PathVariable UUID menuId,
             @Valid @RequestBody com.tulocal.backend.modules.Business.api.request.CreateMenuItemRequest request) {
         request.setMenuId(menuId);
-        com.tulocal.backend.modules.Business.domain.model.MenuItem created = createMenuItemUseCase.execute(businessId, request);
-        com.tulocal.backend.modules.Business.api.response.MenuItemResponse response = businessMapper.toMenuItemResponse(created);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Menu item creado correctamente", response));
+        com.tulocal.backend.modules.Business.domain.model.MenuItem created = createMenuItemUseCase.execute(businessId,
+                request);
+        com.tulocal.backend.modules.Business.api.response.MenuItemResponse response = businessMapper
+                .toMenuItemResponse(created);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Menu item creado correctamente", response));
     }
 
-        @PostMapping("/{businessId}/menus")
-        public ResponseEntity<ApiResponse<MenuResponse>> createMenu(
+    @PostMapping("/{businessId}/menus")
+    public ResponseEntity<ApiResponse<MenuResponse>> createMenu(
             @PathVariable UUID businessId,
             @Valid @RequestBody CreateMenuRequest request) {
         MenuResponse response = businessMapper.toMenuResponse(createMenuUseCase.execute(businessId, request));
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ApiResponse.ok("Menu creado correctamente", response));
-        }
+                .body(ApiResponse.ok("Menu creado correctamente", response));
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<BusinessResponse>>> getAllBusinesses() {
@@ -84,7 +86,7 @@ public class BusinessController {
                 .stream()
                 .map(businessMapper::toResponse)
                 .collect(Collectors.toList());
-         return ResponseEntity.ok(ApiResponse.ok("Negocios obtenidos correctamente", responses));
+        return ResponseEntity.ok(ApiResponse.ok("Negocios obtenidos correctamente", responses));
     }
 
     @GetMapping("/{id}")
@@ -101,6 +103,7 @@ public class BusinessController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok("Negocios encontrados", responses));
     }
+
     @GetMapping("/categoria/{categoryId}")
     public ResponseEntity<ApiResponse<List<BusinessResponse>>> getBusinessByCategory(@PathVariable Integer categoryId) {
         List<BusinessResponse> responses = getBusinessByCategoryUseCase.execute(categoryId)
@@ -109,7 +112,5 @@ public class BusinessController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok("Negocios de la categoría obtenidos correctamente", responses));
     }
-
-
 
 }

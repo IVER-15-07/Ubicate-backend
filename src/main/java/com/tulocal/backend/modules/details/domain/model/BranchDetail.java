@@ -13,6 +13,7 @@ public class BranchDetail {
     private UUID id;
     private UUID businessId;
     private String nombre;
+    private Boolean isActive;
     private LocalDateTime creadoEn;
     private LocationDetail location;
     private List<MenuDetail> menus;
