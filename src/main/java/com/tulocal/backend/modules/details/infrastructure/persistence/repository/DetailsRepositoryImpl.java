@@ -178,7 +178,7 @@ public class DetailsRepositoryImpl implements DetailsRepository {
 
     private List<MenuItemDetail> findMenuItems(UUID menuId) {
         String sql = "SELECT id, nombre, descripcion, precio FROM menu_items " +
-            "WHERE menu_id = ?";
+            "WHERE menu_id = ? AND is_active = true";
 
         List<MenuItemDetail> items = jdbcTemplate.query(sql, (rs, rowNum) -> {
             MenuItemDetail item = new MenuItemDetail();

@@ -1,27 +1,30 @@
 package com.tulocal.backend.modules.Business.api.controller;
 
+import com.tulocal.backend.common.ApiResponse;
 import com.tulocal.backend.modules.Business.api.request.BusinessRequest;
-import com.tulocal.backend.modules.Business.api.request.CreateBranchRequest;
-import com.tulocal.backend.modules.Business.api.request.CreateMenuRequest;
+import com.tulocal.backend.modules.Business.api.request.UpdateBusinessRequest;
+import com.tulocal.backend.modules.Business.api.response.BusinessResponse;
 import com.tulocal.backend.modules.Business.application.mapper.BusinessMapper;
-import com.tulocal.backend.modules.Business.application.usecase.CreateBranchUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.CreateBusinessUseCase;
-import com.tulocal.backend.modules.Business.application.usecase.CreateMenuItemUseCase;
-import com.tulocal.backend.modules.Business.application.usecase.CreateMenuUseCase;
+import com.tulocal.backend.modules.Business.application.usecase.DeleteBusinessUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.GetAllBusinessByIdUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.GetAllBusinessUseCase;
-import com.tulocal.backend.modules.Business.application.usecase.SearchBusinessByNameUseCase;
 import com.tulocal.backend.modules.Business.application.usecase.GetBusinessByCategoryUseCase;
-import com.tulocal.backend.modules.Business.api.response.BranchResponse;
-import com.tulocal.backend.modules.Business.api.response.BusinessResponse;
-import com.tulocal.backend.modules.Business.api.response.MenuResponse;
+import com.tulocal.backend.modules.Business.application.usecase.SearchBusinessByNameUseCase;
+import com.tulocal.backend.modules.Business.application.usecase.UpdateBusinessUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import com.tulocal.backend.common.ApiResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,14 +34,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/business")
 @RequiredArgsConstructor
 public class BusinessController {
+
     private final CreateBusinessUseCase createBusinessUseCase;
-    private final CreateBranchUseCase createBranchUseCase;
-    private final CreateMenuUseCase createMenuUseCase;
+    private final UpdateBusinessUseCase updateBusinessUseCase;
+    private final DeleteBusinessUseCase deleteBusinessUseCase;
     private final GetAllBusinessUseCase getAllBusinessUseCase;
     private final GetAllBusinessByIdUseCase getAllBusinessByIdUseCase;
     private final SearchBusinessByNameUseCase searchBusinessByNameUseCase;
     private final GetBusinessByCategoryUseCase getBusinessByCategoryUseCase;
-    private final CreateMenuItemUseCase createMenuItemUseCase;
     private final BusinessMapper businessMapper;
 
     @PostMapping
@@ -48,36 +51,18 @@ public class BusinessController {
                 .body(ApiResponse.ok("Negocio creado correctamente", response));
     }
 
-    @PostMapping("/{businessId}/branches")
-    public ResponseEntity<ApiResponse<BranchResponse>> createBranch(
+    @PutMapping("/{businessId}")
+    public ResponseEntity<ApiResponse<BusinessResponse>> updateBusiness(
             @PathVariable UUID businessId,
-            @Valid @RequestBody CreateBranchRequest request) {
-        BranchResponse response = businessMapper.toBranchResponse(createBranchUseCase.execute(businessId, request));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Sucursal creada correctamente", response));
+            @Valid @RequestBody UpdateBusinessRequest request) {
+        BusinessResponse response = businessMapper.toResponse(updateBusinessUseCase.execute(businessId, request));
+        return ResponseEntity.ok(ApiResponse.ok("Negocio actualizado correctamente", response));
     }
 
-    @PostMapping("/{businessId}/menus/{menuId}/items")
-    public ResponseEntity<ApiResponse<com.tulocal.backend.modules.Business.api.response.MenuItemResponse>> createMenuItem(
-            @PathVariable UUID businessId,
-            @PathVariable UUID menuId,
-            @Valid @RequestBody com.tulocal.backend.modules.Business.api.request.CreateMenuItemRequest request) {
-        request.setMenuId(menuId);
-        com.tulocal.backend.modules.Business.domain.model.MenuItem created = createMenuItemUseCase.execute(businessId,
-                request);
-        com.tulocal.backend.modules.Business.api.response.MenuItemResponse response = businessMapper
-                .toMenuItemResponse(created);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Menu item creado correctamente", response));
-    }
-
-    @PostMapping("/{businessId}/menus")
-    public ResponseEntity<ApiResponse<MenuResponse>> createMenu(
-            @PathVariable UUID businessId,
-            @Valid @RequestBody CreateMenuRequest request) {
-        MenuResponse response = businessMapper.toMenuResponse(createMenuUseCase.execute(businessId, request));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Menu creado correctamente", response));
+    @DeleteMapping("/{businessId}")
+    public ResponseEntity<ApiResponse<Void>> deleteBusiness(@PathVariable UUID businessId) {
+        deleteBusinessUseCase.execute(businessId);
+        return ResponseEntity.ok(ApiResponse.ok("Negocio dado de baja correctamente", null));
     }
 
     @GetMapping
@@ -112,5 +97,4 @@ public class BusinessController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok("Negocios de la categoría obtenidos correctamente", responses));
     }
-
 }

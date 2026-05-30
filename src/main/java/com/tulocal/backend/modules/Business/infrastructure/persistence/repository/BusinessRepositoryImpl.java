@@ -92,6 +92,37 @@ public class BusinessRepositoryImpl implements BusinessRepository {
     }
 
     @Override
+    public Business update(Business business) {
+        String sql = "UPDATE business SET nombre = ?, descripcion = ?, category_id = ?, logo_url = ?, banner_url = ?, is_active = ? " +
+                "WHERE id = ? RETURNING id, owner_user_id, nombre, descripcion, category_id, logo_url, banner_url, is_active, creado_en";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Business result = new Business();
+            result.setId(UUID.fromString(rs.getString("id")));
+            String owner = rs.getString("owner_user_id");
+            if (owner != null) {
+                result.setOwnerUserId(UUID.fromString(owner));
+            }
+            result.setNombre(rs.getString("nombre"));
+            result.setDescripcion(rs.getString("descripcion"));
+            result.setCategoryId(rs.getObject("category_id") == null ? null : rs.getInt("category_id"));
+            result.setLogoUrl(rs.getString("logo_url"));
+            result.setBannerUrl(rs.getString("banner_url"));
+            result.setIsActive(rs.getBoolean("is_active"));
+            java.sql.Timestamp ts = rs.getTimestamp("creado_en");
+            if (ts != null) {
+                result.setCreadoEn(ts.toLocalDateTime());
+            }
+            result.setBranches(new java.util.ArrayList<>());
+            return result;
+        }, business.getNombre(), business.getDescripcion(), business.getCategoryId(), business.getLogoUrl(), business.getBannerUrl(), business.getIsActive(), business.getId());
+    }
+
+    @Override
+    public void deleteBusiness(UUID id) {
+        jdbcTemplate.update("UPDATE business SET is_active = false WHERE id = ?", id);
+    }
+
+    @Override
     public List<Business> findByNombreContaining(String nombre) {
         String sql = SELECT_WITH_BRANCHES + "WHERE b.is_active = true AND LOWER(b.nombre) LIKE LOWER(?)";
         return queryBusinessesWithBranches(sql, "%" + nombre + "%");
@@ -197,6 +228,69 @@ public class BusinessRepositoryImpl implements BusinessRepository {
     }
 
     @Override
+    public Branch findBranchById(UUID id) {
+        String sql = "SELECT id, business_id, nombre, is_active, creado_en FROM branch WHERE id = ?";
+        return jdbcTemplate.query(sql, rs -> {
+            if (!rs.next()) return null;
+            Branch branch = new Branch();
+            branch.setId(UUID.fromString(rs.getString("id")));
+            branch.setBusinessId(UUID.fromString(rs.getString("business_id")));
+            branch.setNombre(rs.getString("nombre"));
+            branch.setIsActive(rs.getBoolean("is_active"));
+            java.sql.Timestamp ts = rs.getTimestamp("creado_en");
+            if (ts != null) {
+                branch.setCreadoEn(ts.toLocalDateTime());
+            }
+            branch.setLocations(new java.util.ArrayList<>());
+            return branch;
+        }, id);
+    }
+
+    @Override
+    public Branch updateBranch(Branch branch) {
+        String sql = "UPDATE branch SET nombre = ?, is_active = ? WHERE id = ? RETURNING id, business_id, nombre, is_active, creado_en";
+        Branch updated = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Branch result = new Branch();
+            result.setId(UUID.fromString(rs.getString("id")));
+            result.setBusinessId(UUID.fromString(rs.getString("business_id")));
+            result.setNombre(rs.getString("nombre"));
+            result.setIsActive(rs.getBoolean("is_active"));
+            java.sql.Timestamp ts = rs.getTimestamp("creado_en");
+            if (ts != null) {
+                result.setCreadoEn(ts.toLocalDateTime());
+            }
+            result.setLocations(new java.util.ArrayList<>());
+            return result;
+        }, branch.getNombre(), branch.getIsActive(), branch.getId());
+
+        if (updated != null && branch.getLocations() != null && !branch.getLocations().isEmpty()) {
+            Location locationInput = branch.getLocations().get(0);
+            Integer existingLocation = jdbcTemplate.query(
+                    "SELECT COUNT(*) FROM locations WHERE branch_id = ?",
+                    rs -> {
+                        rs.next();
+                        return rs.getInt(1);
+                    },
+                    updated.getId());
+
+            if (existingLocation != null && existingLocation > 0) {
+                jdbcTemplate.update("UPDATE locations SET lat = ?, lng = ?, direccion = ? WHERE branch_id = ?",
+                        locationInput.getLat(), locationInput.getLng(), locationInput.getDireccion(), updated.getId());
+            } else {
+                jdbcTemplate.update("INSERT INTO locations (branch_id, lat, lng, direccion) VALUES (?, ?, ?, ?)",
+                        updated.getId(), locationInput.getLat(), locationInput.getLng(), locationInput.getDireccion());
+            }
+        }
+
+        return updated;
+    }
+
+    @Override
+    public void deleteBranch(UUID branchId) {
+        jdbcTemplate.update("UPDATE branch SET is_active = false WHERE id = ?", branchId);
+    }
+
+    @Override
     public Menu saveMenu(Menu menu) {
         String sql = "INSERT INTO menus (business_id, nombre, is_active) VALUES (?, ?, COALESCE(?, true)) " +
                 "RETURNING id, business_id, nombre, is_active, creado_en";
@@ -227,6 +321,40 @@ public class BusinessRepositoryImpl implements BusinessRepository {
     }
 
     @Override
+    public Menu updateMenu(Menu menu) {
+        String sql = "UPDATE menus SET nombre = ?, is_active = ? WHERE id = ? RETURNING id, business_id, nombre, is_active, creado_en";
+        Menu updated = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Menu result = new Menu();
+            result.setId(UUID.fromString(rs.getString("id")));
+            result.setBusinessId(UUID.fromString(rs.getString("business_id")));
+            result.setNombre(rs.getString("nombre"));
+            result.setIsActive(rs.getBoolean("is_active"));
+            java.sql.Timestamp ts = rs.getTimestamp("creado_en");
+            if (ts != null) {
+                result.setCreadoEn(ts.toLocalDateTime());
+            }
+            result.setBranchIds(new ArrayList<>());
+            return result;
+        }, menu.getNombre(), menu.getIsActive(), menu.getId());
+
+        if (updated != null && menu.getBranchIds() != null) {
+            jdbcTemplate.update("DELETE FROM branch_menu WHERE menu_id = ?", updated.getId());
+            String branchMenuSql = "INSERT INTO branch_menu (branch_id, menu_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+            for (UUID branchId : menu.getBranchIds()) {
+                jdbcTemplate.update(branchMenuSql, branchId, updated.getId());
+                updated.getBranchIds().add(branchId);
+            }
+        }
+
+        return updated;
+    }
+
+    @Override
+    public void deleteMenu(UUID menuId) {
+        jdbcTemplate.update("UPDATE menus SET is_active = false WHERE id = ?", menuId);
+    }
+
+    @Override
     public Menu findMenuById(UUID id) {
         String sql = "SELECT id, business_id, nombre, is_active, creado_en FROM menus WHERE id = ?";
         return jdbcTemplate.query(sql, rs -> {
@@ -240,6 +368,70 @@ public class BusinessRepositoryImpl implements BusinessRepository {
             if (ts != null) m.setCreadoEn(ts.toLocalDateTime());
             return m;
         }, id);
+    }
+
+    @Override
+    public MenuItem findMenuItemById(UUID itemId) {
+        String sql = "SELECT id, menu_id, nombre, descripcion, precio, photo_url, is_active, creado_en FROM menu_items WHERE id = ?";
+        return jdbcTemplate.query(sql, rs -> {
+            if (!rs.next()) return null;
+            MenuItem item = new MenuItem();
+            item.setId(UUID.fromString(rs.getString("id")));
+            item.setMenuId(UUID.fromString(rs.getString("menu_id")));
+            item.setNombre(rs.getString("nombre"));
+            item.setDescripcion(rs.getString("descripcion"));
+            java.math.BigDecimal price = rs.getBigDecimal("precio");
+            if (price != null) item.setPrecio(price);
+            item.setPhotoUrl(rs.getString("photo_url"));
+            item.setIsActive(rs.getBoolean("is_active"));
+            java.sql.Timestamp ts = rs.getTimestamp("creado_en");
+            if (ts != null) item.setCreadoEn(ts.toLocalDateTime());
+            item.setImages(new ArrayList<>());
+            return item;
+        }, itemId);
+    }
+
+    @Override
+    public MenuItem updateMenuItem(MenuItem item) {
+        String sql = "UPDATE menu_items SET menu_id = ?, nombre = ?, descripcion = ?, precio = ?, photo_url = ?, is_active = ? " +
+                "WHERE id = ? RETURNING id, menu_id, nombre, descripcion, precio, photo_url, is_active, creado_en";
+        MenuItem updated = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            MenuItem result = new MenuItem();
+            result.setId(UUID.fromString(rs.getString("id")));
+            result.setMenuId(UUID.fromString(rs.getString("menu_id")));
+            result.setNombre(rs.getString("nombre"));
+            result.setDescripcion(rs.getString("descripcion"));
+            java.math.BigDecimal price = rs.getBigDecimal("precio");
+            if (price != null) result.setPrecio(price);
+            result.setPhotoUrl(rs.getString("photo_url"));
+            result.setIsActive(rs.getBoolean("is_active"));
+            java.sql.Timestamp ts = rs.getTimestamp("creado_en");
+            if (ts != null) {
+                result.setCreadoEn(ts.toLocalDateTime());
+            }
+            result.setImages(new ArrayList<>());
+            return result;
+        }, item.getMenuId(), item.getNombre(), item.getDescripcion(), item.getPrecio(), item.getPhotoUrl(), item.getIsActive(), item.getId());
+
+        if (updated != null && item.getImages() != null) {
+            jdbcTemplate.update("DELETE FROM menu_images WHERE menu_item_id = ?", updated.getId());
+            String imageSql = "INSERT INTO menu_images (menu_item_id, url, orden) VALUES (?, ?, ?)";
+            for (MenuImage imageInput : item.getImages()) {
+                jdbcTemplate.update(imageSql, updated.getId(), imageInput.getUrl(), imageInput.getOrden());
+                MenuImage image = new MenuImage();
+                image.setMenuItemId(updated.getId());
+                image.setUrl(imageInput.getUrl());
+                image.setOrden(imageInput.getOrden());
+                updated.getImages().add(image);
+            }
+        }
+
+        return updated;
+    }
+
+    @Override
+    public void deleteMenuItem(UUID itemId) {
+        jdbcTemplate.update("UPDATE menu_items SET is_active = false WHERE id = ?", itemId);
     }
 
     @Override
