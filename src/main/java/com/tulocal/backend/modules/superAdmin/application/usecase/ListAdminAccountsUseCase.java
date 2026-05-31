@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ListAdminAccountsUseCase {
 
-    public static final int ADMIN_ROLE_ID = 1;
+    public static final int ADMIN_ROLE_ID = 2;
 
     private final UserRepository userRepository;
 

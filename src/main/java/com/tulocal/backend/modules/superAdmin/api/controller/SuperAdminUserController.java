@@ -45,7 +45,8 @@ public class SuperAdminUserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UserResponse>> createAdmin(@Valid @RequestBody CreateAdminAccountRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> createAdmin(
+            @Valid @RequestBody CreateAdminAccountRequest request) {
         UserResponse response = userMapper.toResponse(createAdminAccountUseCase.execute(request));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Cuenta de administrador creada correctamente", response));
@@ -53,7 +54,7 @@ public class SuperAdminUserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResponse>> updateAdmin(@PathVariable UUID userId,
-                                                                 @Valid @RequestBody UpdateAdminAccountRequest request) {
+            @Valid @RequestBody UpdateAdminAccountRequest request) {
         UserResponse response = userMapper.toResponse(updateAdminAccountUseCase.execute(userId, request));
         return ResponseEntity.ok(ApiResponse.ok("Cuenta de administrador actualizada correctamente", response));
     }

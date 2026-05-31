@@ -43,7 +43,8 @@ public class SuperAdminCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CreateMapCategoryRequest request) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
+            @Valid @RequestBody CreateMapCategoryRequest request) {
         CategoryResponse response = toResponse(createMapCategoryUseCase.execute(request));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Categoría de mapa creada correctamente", response));
@@ -51,7 +52,7 @@ public class SuperAdminCategoryController {
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(@PathVariable Integer categoryId,
-                                                                        @Valid @RequestBody UpdateMapCategoryRequest request) {
+            @Valid @RequestBody UpdateMapCategoryRequest request) {
         CategoryResponse response = toResponse(updateMapCategoryUseCase.execute(categoryId, request));
         return ResponseEntity.ok(ApiResponse.ok("Categoría de mapa actualizada correctamente", response));
     }

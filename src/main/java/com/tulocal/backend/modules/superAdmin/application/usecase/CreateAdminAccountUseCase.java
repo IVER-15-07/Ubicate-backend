@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CreateAdminAccountUseCase {
 
-    public static final int ADMIN_ROLE_ID = 1;
+    public static final int ADMIN_ROLE_ID = 2;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
