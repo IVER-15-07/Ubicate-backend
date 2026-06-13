@@ -37,7 +37,8 @@ public class MenuItemController {
             @PathVariable UUID menuId,
             @Valid @RequestBody CreateMenuItemRequest request) {
         request.setMenuId(menuId);
-        MenuItemResponse response = businessMapper.toMenuItemResponse(createMenuItemUseCase.execute(businessId, request));
+        MenuItemResponse response = businessMapper
+                .toMenuItemResponse(createMenuItemUseCase.execute(businessId, request));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Menu item creado correctamente", response));
     }
@@ -49,14 +50,15 @@ public class MenuItemController {
             @PathVariable UUID itemId,
             @Valid @RequestBody CreateMenuItemRequest request) {
         request.setMenuId(menuId);
-        MenuItemResponse response = businessMapper.toMenuItemResponse(updateMenuItemUseCase.execute(businessId, menuId, itemId, request));
+        MenuItemResponse response = businessMapper
+                .toMenuItemResponse(updateMenuItemUseCase.execute(businessId, menuId, itemId, request));
         return ResponseEntity.ok(ApiResponse.ok("Menu item actualizado correctamente", response));
     }
 
     @DeleteMapping("/{businessId}/menus/{menuId}/items/{itemId}")
     public ResponseEntity<ApiResponse<Void>> deleteMenuItem(@PathVariable UUID businessId,
-                                                            @PathVariable UUID menuId,
-                                                            @PathVariable UUID itemId) {
+            @PathVariable UUID menuId,
+            @PathVariable UUID itemId) {
         deleteMenuItemUseCase.execute(itemId);
         return ResponseEntity.ok(ApiResponse.ok("Menu item dado de baja correctamente", null));
     }

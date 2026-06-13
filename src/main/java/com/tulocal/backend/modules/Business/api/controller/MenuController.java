@@ -51,8 +51,9 @@ public class MenuController {
 
     @DeleteMapping("/{businessId}/menus/{menuId}")
     public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable UUID businessId,
-                                                        @PathVariable UUID menuId) {
+            @PathVariable UUID menuId) {
         deleteMenuUseCase.execute(menuId);
         return ResponseEntity.ok(ApiResponse.ok("Menu dado de baja correctamente", null));
     }
+    
 }

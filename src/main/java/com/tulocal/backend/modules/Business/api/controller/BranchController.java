@@ -46,13 +46,14 @@ public class BranchController {
             @PathVariable UUID businessId,
             @PathVariable UUID branchId,
             @Valid @RequestBody UpdateBranchRequest request) {
-        BranchResponse response = businessMapper.toBranchResponse(updateBranchUseCase.execute(businessId, branchId, request));
+        BranchResponse response = businessMapper
+                .toBranchResponse(updateBranchUseCase.execute(businessId, branchId, request));
         return ResponseEntity.ok(ApiResponse.ok("Sucursal actualizada correctamente", response));
     }
 
     @DeleteMapping("/{businessId}/branches/{branchId}")
     public ResponseEntity<ApiResponse<Void>> deleteBranch(@PathVariable UUID businessId,
-                                                          @PathVariable UUID branchId) {
+            @PathVariable UUID branchId) {
         deleteBranchUseCase.execute(branchId);
         return ResponseEntity.ok(ApiResponse.ok("Sucursal dada de baja correctamente", null));
     }
