@@ -6,6 +6,7 @@ import com.tulocal.backend.modules.branch.domain.repository.BranchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -14,10 +15,10 @@ public class CreateBranchUseCase {
     private final BranchRepository branchRepository;
 
     @Transactional
-    public Branch execute(CreateBranchRequest request) {
+    public Branch execute(CreateBranchRequest request, UUID ownerUserId) {
 
         Branch branch = new Branch();
-        branch.setOwnerUserId(request.getOwnerUserId());
+        branch.setOwnerUserId(ownerUserId);
         branch.setCategoryId(request.getCategoryId());
         branch.setNombre(request.getNombre().trim());
         branch.setDescripcion(request.getDescripcion());
