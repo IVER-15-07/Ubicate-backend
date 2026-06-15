@@ -31,8 +31,9 @@ public class GlobalExceptionHandler {
         for (FieldError fe : ex.getBindingResult().getFieldErrors()) {
             errors.put(fe.getField(), fe.getDefaultMessage());
         }
+
         return ResponseEntity.badRequest()
-                .body(ApiResponse.error("Error de validación"));
+                .body(ApiResponse.error("Error de validación en los campos", errors));
     }
 
     // ── Spring Security: token inválido ──
@@ -52,6 +53,9 @@ public class GlobalExceptionHandler {
     // ── Cualquier otro error ──
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
+        // Dejamos el print en consola para que tú como dev sigas viendo qué falló
+        // exactamente internamente
+        ex.printStackTrace();
         return ResponseEntity.status(500)
                 .body(ApiResponse.error("Error interno del servidor"));
     }

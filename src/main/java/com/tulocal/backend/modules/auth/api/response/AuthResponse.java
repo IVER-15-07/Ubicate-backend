@@ -7,6 +7,7 @@ import java.util.UUID;
 @Data
 public class AuthResponse {
     private String token;
+    private String refreshToken;
     private UUID userId;
     private Integer roleId;
     private String email;
