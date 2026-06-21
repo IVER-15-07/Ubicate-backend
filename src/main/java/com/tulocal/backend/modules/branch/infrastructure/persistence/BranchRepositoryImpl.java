@@ -75,7 +75,9 @@ public class BranchRepositoryImpl implements BranchRepository {
 
     @Override
     public Branch findById(UUID id) {
-        throw new UnsupportedOperationException();
+         return springDataBranchRepository.findById(id)
+            .map(this::toModel)
+            .orElse(null);
     }
 
     @Override
