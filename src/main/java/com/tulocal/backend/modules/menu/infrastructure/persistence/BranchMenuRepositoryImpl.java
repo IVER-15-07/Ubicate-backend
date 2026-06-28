@@ -79,4 +79,9 @@ public class BranchMenuRepositoryImpl implements BranchMenuRepository {
     public void delete(UUID id) {
         springDataBranchMenuRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAllByMenuId(UUID menuId) {
+        springDataBranchMenuRepository.deleteAllByMenuId(menuId);
+    }
 }

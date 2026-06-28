@@ -19,5 +19,5 @@ public class CreateMenuItemRequest {
     @DecimalMin(value = "0.0", inclusive = true, message = "El precio no puede ser negativo")
     private BigDecimal precio;
 
-    private String photoUrl;
+
 }

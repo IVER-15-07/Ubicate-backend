@@ -13,5 +13,6 @@ public interface BranchMenuRepository {
     List<BranchMenu> findByMenuId(UUID menuId);
     BranchMenu updateActive(UUID id, boolean isActive);
     void delete(UUID id);
+    void deleteAllByMenuId(UUID menuId);
 
 }

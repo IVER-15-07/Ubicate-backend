@@ -9,6 +9,7 @@ public interface MenuItemRepository {
     MenuItem findById(UUID id);
     List<MenuItem> findByMenuId(UUID menuId);
     MenuItem update(MenuItem menuItem);
+    void deleteAllByMenuId(UUID menuId);
     void delete(UUID id);
 
 }

@@ -59,7 +59,21 @@ public class MenuItemRepositoryImpl implements MenuItemRepository {
 
     @Override
     public MenuItem update(MenuItem menuItem) {
-        throw new UnsupportedOperationException();
+        MenuItemEntity entity = springDataMenuItemRepository.findById(menuItem.getId())
+                .orElseThrow(() -> new IllegalArgumentException("El platillo no existe"));
+
+        entity.setNombre(menuItem.getNombre());
+        entity.setDescripcion(menuItem.getDescripcion());
+        entity.setPrecio(menuItem.getPrecio());
+        entity.setPhotoUrl(menuItem.getPhotoUrl());
+        entity.setIsActive(menuItem.getIsActive());
+
+        return toModel(springDataMenuItemRepository.save(entity));
+    }
+
+    @Override
+    public void deleteAllByMenuId(UUID id) {
+        springDataMenuItemRepository.deleteAllByMenuId(id);
     }
 
     @Override

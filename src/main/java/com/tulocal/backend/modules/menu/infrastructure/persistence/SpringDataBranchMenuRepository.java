@@ -9,4 +9,7 @@ public interface SpringDataBranchMenuRepository extends JpaRepository<BranchMenu
     List<BranchMenuEntity> findByBranchId(UUID branchId);
     List<BranchMenuEntity> findByMenuId(UUID menuId);
     Optional<BranchMenuEntity> findByBranchIdAndMenuId(UUID branchId, UUID menuId);
+    void deleteAllByMenuId(UUID menuId);
+
+
 }

@@ -1,57 +1,57 @@
 package com.tulocal.backend.modules.branch.application.usecase;
 
-import com.tulocal.backend.modules.branch.api.request.CreateBranchRequest;
+import com.tulocal.backend.modules.branch.api.request.UpdateBranchRequest;
 import com.tulocal.backend.modules.branch.domain.model.Branch;
 import com.tulocal.backend.modules.branch.domain.repository.BranchRepository;
-
 import com.tulocal.backend.common.service.CloudinaryService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class CreateBranchUseCase {
+public class UpdateBranchUseCase {
 
     private final BranchRepository branchRepository;
     private final CloudinaryService cloudinaryService;
 
     @Transactional
-    public Branch execute(CreateBranchRequest request, UUID ownerUserId,
+    public Branch execute(UUID branchId, UpdateBranchRequest request, UUID ownerUserId,
                           MultipartFile logo, MultipartFile banner) throws Exception {
 
-        String logoUrl = null;
-        String bannerUrl = null;
+        Branch branch = branchRepository.findById(branchId);
+        if (branch == null)
+            throw new IllegalArgumentException("La sucursal no existe");
+        if (!branch.getOwnerUserId().equals(ownerUserId))
+            throw new IllegalArgumentException("No tienes permiso sobre esta sucursal");
 
+        // si manda logo nuevo → borra el viejo y sube el nuevo
         if (logo != null && !logo.isEmpty()) {
-            logoUrl = cloudinaryService.upload(logo, "tulocal/branches/logos");
+            if (branch.getLogoUrl() != null)
+                cloudinaryService.delete(branch.getLogoUrl());
+            branch.setLogoUrl(cloudinaryService.upload(logo, "tulocal/branches/logos"));
         }
 
+        // si manda banner nuevo → borra el viejo y sube el nuevo
         if (banner != null && !banner.isEmpty()) {
-            bannerUrl = cloudinaryService.upload(banner, "tulocal/branches/banners");
+            if (branch.getBannerUrl() != null)
+                cloudinaryService.delete(branch.getBannerUrl());
+            branch.setBannerUrl(cloudinaryService.upload(banner, "tulocal/branches/banners"));
         }
 
-        Branch branch = new Branch();
-        branch.setOwnerUserId(ownerUserId);
         branch.setCategoryId(request.getCategoryId());
         branch.setNombre(request.getNombre().trim());
         branch.setDescripcion(request.getDescripcion());
-        branch.setLogoUrl(logoUrl);
-        branch.setBannerUrl(bannerUrl);
         branch.setLat(request.getLat());
         branch.setLng(request.getLng());
         branch.setDireccion(request.getDireccion());
         branch.setTelefono(request.getTelefono());
-        branch.setIsActive(false);
-        branch.setCreadoEn(LocalDateTime.now());
+        if (request.getIsActive() != null)
+            branch.setIsActive(request.getIsActive());
 
-        return branchRepository.save(branch);
+        return branchRepository.update(branch);
     }
 }
-
-    
-

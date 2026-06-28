@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SpringDataMenuItemRepository extends JpaRepository<MenuItemEntity, UUID> {
     List<MenuItemEntity> findByMenuId(UUID menuId);
-}
+    void deleteAllByMenuId(UUID menuId);
+} 

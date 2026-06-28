@@ -4,25 +4,24 @@ import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
-
 @Data
-public class CreateBranchRequest {
+public class UpdateBranchRequest {
 
     @NotNull(message = "El id de categoría es obligatorio")
     private Integer categoryId;
 
     @NotBlank(message = "El nombre de la sucursal es obligatorio")
     private String nombre;
+
     private String descripcion;
+    private String direccion;
+    private String telefono;
 
     @NotNull(message = "La latitud es obligatoria")
     private Double lat;
+
     @NotNull(message = "La longitud es obligatoria")
     private Double lng;
-    private String direccion;
-    private String telefono;
-    private Boolean isActive = false;
-    private LocalDateTime creadoEn = LocalDateTime.now();
 
+    private Boolean isActive;
 }
