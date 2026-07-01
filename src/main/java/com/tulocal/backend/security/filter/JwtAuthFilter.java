@@ -34,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // Sin token → continúa (Spring Security decide si la ruta es pública o no)
+        // Sin token → continúa sin problemas
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -45,20 +45,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             TokenPayload payload = jwtService.verifyAccessToken(token);
 
-            // Convertir role a authority para Spring Security
-            List<SimpleGrantedAuthority> authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_" + payload.getRole().toUpperCase()));
+            // 💡 Validación extra: Evitamos el NullPointerException si el rol es null o
+            // vacío
+            if (payload != null && payload.getRole() != null && !payload.getRole().isBlank()) {
 
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(payload, null,
-                    authorities);
+                List<SimpleGrantedAuthority> authorities = List.of(
+                        new SimpleGrantedAuthority("ROLE_" + payload.getRole().toUpperCase()));
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        payload, null, authorities);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                // Si el token no trae rol válido, limpiamos el contexto
+                SecurityContextHolder.clearContext();
+            }
 
         } catch (Exception e) {
-            // Token inválido → Spring Security rechazará si la ruta es protegida
+            // Si el token expiró o es corrupto, limpiamos el contexto por completo
             SecurityContextHolder.clearContext();
         }
 
+        // Continuar con el flujo de filtros de Spring
         filterChain.doFilter(request, response);
     }
 }

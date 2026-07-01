@@ -21,6 +21,9 @@ public class BranchEntity {
     private Integer categoryId;
 
     private String nombre;
+    
+    @Transient
+    private String categoryName;
     private String descripcion;
     private String telefono;
 

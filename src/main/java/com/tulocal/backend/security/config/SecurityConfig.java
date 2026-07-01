@@ -39,14 +39,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // ── RUTAS PÚBLICAS (equivalente a rutas sin authMiddleware en Node) ──
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/branches/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/branches/public/all-active").permitAll()
+
 
                         // ── RUTAS PROTEGIDAS (requieren JWT válido) ──
 
                         .requestMatchers(HttpMethod.POST, "/api/branches/create").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/branch-menus/**").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/branch-menus/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/menus/**").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/menus/**").authenticated()
 
                         .anyRequest().authenticated())
 

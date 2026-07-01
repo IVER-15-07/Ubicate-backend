@@ -16,6 +16,7 @@ public BranchResponse toResponse(Branch branch) {
 
     response.setCategoryId(branch.getCategoryId());
     response.setNombre(branch.getNombre());
+    //response.setCategoryName(branch.getCategoryName());
     response.setDescripcion(branch.getDescripcion());
     response.setLogoUrl(branch.getLogoUrl());
     response.setBannerUrl(branch.getBannerUrl());
@@ -28,5 +29,6 @@ public BranchResponse toResponse(Branch branch) {
 
     return response;
 }
+
     
 }

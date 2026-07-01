@@ -1,12 +1,11 @@
 package com.tulocal.backend.modules.auth.domain.repository;
 
 import com.tulocal.backend.modules.auth.domain.model.AuthUser;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
-import java.util.UUID;
 
-public interface AuthUserRepository extends JpaRepository<AuthUser, UUID> {
+
+public interface AuthUserRepository {
     Optional<AuthUser> findByEmailIgnoreCase(String email);
     boolean existsByEmailIgnoreCase(String email);
+    AuthUser save(AuthUser user);
 }

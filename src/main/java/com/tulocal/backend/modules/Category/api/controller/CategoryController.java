@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/categorias")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
