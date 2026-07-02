@@ -3,11 +3,13 @@ package com.tulocal.backend.modules.branch.api.controller;
 import com.tulocal.backend.common.response.ApiResponse;
 import com.tulocal.backend.modules.branch.api.request.CreateBranchRequest;
 import com.tulocal.backend.modules.branch.api.request.UpdateBranchRequest;
+import com.tulocal.backend.modules.branch.api.response.BranchDetailResponse;
 import com.tulocal.backend.modules.branch.api.response.BranchMapPointResponse;
 import com.tulocal.backend.modules.branch.api.response.BranchResponse;
 import com.tulocal.backend.modules.branch.application.mapper.BranchMapper;
 import com.tulocal.backend.modules.branch.application.usecase.CreateBranchUseCase;
 import com.tulocal.backend.modules.branch.application.usecase.DeleteBranchUseCase;
+import com.tulocal.backend.modules.branch.application.usecase.GetBranchDetailUseCase;
 import com.tulocal.backend.modules.branch.application.usecase.GetMyBranchesUseCase;
 import com.tulocal.backend.modules.branch.application.usecase.SearchBranchesUseCase;
 import com.tulocal.backend.modules.branch.application.usecase.UpdateBranchUseCase;
@@ -37,6 +39,7 @@ public class BranchController {
     private final DeleteBranchUseCase deleteBranchUseCase;
     private final BranchMapper branchMapper;
     private final GetAllActiveBranchesUseCase getAllActiveBranchesUseCase;
+    private final GetBranchDetailUseCase getBranchDetailUseCase;
     private final SearchBranchesUseCase searchBranchesUseCase;
 
     // multipart/form-data: campos del form + archivos en la misma llamada
@@ -100,8 +103,14 @@ public class BranchController {
 
     // OBTENER TODAS LAS SUCURSALES ACTIVAS (para el mapa)
     @GetMapping("/public/all-active")
-    public ResponseEntity<ApiResponse<List<BranchMapPointResponse>>> getAllActiveBranches() {
-        List<BranchMapPointResponse> response = getAllActiveBranchesUseCase.execute();
+    public ResponseEntity<ApiResponse<List<BranchMapPointResponse>>> getAllActiveBranches(
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false, defaultValue = "2") Double radiusKm) {
+
+        List<BranchMapPointResponse> response = (lat != null && lng != null)
+                ? getAllActiveBranchesUseCase.execute(lat, lng, radiusKm)
+                : getAllActiveBranchesUseCase.execute();
 
         return ResponseEntity.ok(ApiResponse.ok("Sucursales activas", response));
     }
@@ -113,5 +122,11 @@ public class BranchController {
             @RequestParam(name = "q") String query) {
         List<BranchMapPointResponse> response = searchBranchesUseCase.execute(query);
         return ResponseEntity.ok(ApiResponse.ok("Resultados de búsqueda", response));
+    }
+
+    @GetMapping("/{id}/details")
+    public ResponseEntity<ApiResponse<BranchDetailResponse>> getBranchDetail(@PathVariable UUID id) {
+        BranchDetailResponse response = getBranchDetailUseCase.execute(id);
+        return ResponseEntity.ok(ApiResponse.ok("Detalle de sucursal", response));
     }
 }

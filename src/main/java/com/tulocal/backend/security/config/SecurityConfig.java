@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/branches/public/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/branches/public/all-active").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/branches/{id}/details").permitAll()
 
 
                         // ── RUTAS PROTEGIDAS (requieren JWT válido) ──

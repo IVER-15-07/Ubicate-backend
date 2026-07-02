@@ -14,7 +14,8 @@ public class SearchBranchesUseCase {
     private final JdbcBranchRepository jdbcBranchRepository;
 
     public List<BranchMapPointResponse> execute(String query) {
-        if (query == null || query.isBlank()) return List.of();
+        if (query == null || query.isBlank())
+            return List.of();
 
         return jdbcBranchRepository.searchBranches(query.trim())
                 .stream()
@@ -23,11 +24,12 @@ public class SearchBranchesUseCase {
                         e.getNombre(),
                         e.getCategoryId(),
                         e.getCategoryName(),
-                e.getDireccion(),
-                e.getLogoUrl(),
-                e.getBannerUrl(),
+                        e.getDireccion(),
+                        e.getLogoUrl(),
+                        e.getBannerUrl(),
+                        null,
                         e.getLat(),
-                        e.getLng()))    
-            .toList();
+                        e.getLng()))
+                .toList();
     }
 }

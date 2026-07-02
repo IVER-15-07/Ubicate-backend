@@ -14,6 +14,7 @@ public class BranchMapPointResponse {
     private String direccion;
     private String logoUrl;
     private String bannerUrl;
+    private Double distanceKm;
     
     private Double lat;
     private Double lng;
