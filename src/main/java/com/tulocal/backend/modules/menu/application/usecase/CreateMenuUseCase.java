@@ -35,7 +35,7 @@ public class CreateMenuUseCase {
         Menu menu = new Menu();
         menu.setOwnerUserId(ownerUserId);
         menu.setNombre(request.getNombre().trim());
-        menu.setIsActive(false);
+        menu.setIsActive(true);
         menu.setCreadoEn(LocalDateTime.now());
 
         Menu savedMenu = menuRepository.save(menu);
